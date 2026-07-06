@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toddler Meal Planner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Toddler Meal Planner <span>20 months old · daily meals for your helper</span></h1>
+    <nav>
+      <button data-view="today" class="active">Today</button>
+      <button data-view="week">Week</button>
+      <button data-view="recipes">Recipes</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- TODAY VIEW -->
+    <section id="view-today" class="view active">
+      <div class="toolbar">
+        <button class="btn no-print" id="prev-day">← Prev</button>
+        <button class="btn no-print" id="today-btn">Today</button>
+        <button class="btn no-print" id="next-day">Next →</button>
+        <div class="spacer"></div>
+        <button class="btn no-print" id="shuffle-day">🔀 Shuffle day</button>
+        <button class="btn no-print" id="copy-day">📋 Copy for WhatsApp</button>
+        <button class="btn primary no-print" id="print-day">🖨️ Print</button>
+      </div>
+      <div class="today-card">
+        <h2 id="today-date"></h2>
+        <div id="today-meals"></div>
+      </div>
+    </section>
+
+    <!-- WEEK VIEW -->
+    <section id="view-week" class="view">
+      <div class="toolbar">
+        <button class="btn no-print" id="prev-week">← Prev week</button>
+        <button class="btn no-print" id="this-week-btn">This week</button>
+        <button class="btn no-print" id="next-week">Next week →</button>
+        <div class="spacer"></div>
+        <strong id="week-label"></strong>
+        <div class="spacer"></div>
+        <button class="btn no-print" id="shuffle-week">🔀 Shuffle week</button>
+        <button class="btn no-print" id="copy-week">📋 Copy for WhatsApp</button>
+        <button class="btn primary no-print" id="print-week">🖨️ Print</button>
+      </div>
+      <div class="week-grid" id="week-grid"></div>
+    </section>
+
+    <!-- RECIPES VIEW -->
+    <section id="view-recipes" class="view">
+      <form class="form-grid no-print" id="recipe-form">
+        <strong>Add a recipe</strong>
+        <div class="form-row">
+          <input id="r-name" placeholder="Recipe name" required />
+          <select id="r-category">
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="snack">Snack</option>
+            <option value="dinner">Dinner</option>
+          </select>
+        </div>
+        <input id="r-ingredients" placeholder="Ingredients (comma separated)" />
+        <input id="r-portion" placeholder="Portion (e.g. 1/2 cup)" />
+        <button type="submit" class="btn primary">Add recipe</button>
+      </form>
+      <div class="recipe-cols" id="recipe-cols"></div>
+    </section>
+  </main>
+
+  <!-- Swap modal -->
+  <div class="modal-backdrop no-print" id="modal-backdrop">
+    <div class="modal">
+      <h3 id="modal-title">Choose recipe</h3>
+      <div id="modal-list"></div>
+      <button class="btn" id="modal-close" style="margin-top:10px">Close</button>
+    </div>
+  </div>
+
+  <script src="recipes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

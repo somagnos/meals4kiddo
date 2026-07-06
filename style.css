@@ -1,0 +1,270 @@
+:root {
+  --bg: #faf7f2;
+  --card: #ffffff;
+  --ink: #2e2a25;
+  --muted: #8a8377;
+  --accent: #e8895f;
+  --accent-dark: #c96a42;
+  --breakfast: #f4c95d;
+  --lunch: #7fb685;
+  --snack: #b48ee0;
+  --dinner: #6a9fd8;
+  --border: #ece6db;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+header h1 span {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.85rem;
+  display: block;
+}
+
+nav {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+nav button {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+nav button.active {
+  background: var(--accent);
+  color: white;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.toolbar .spacer { flex: 1; }
+
+button.btn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 9px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+button.btn:hover { border-color: var(--accent); }
+
+button.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+button.btn.primary:hover { background: var(--accent-dark); }
+
+button.btn.small {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}
+
+/* Today view */
+.today-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 22px;
+}
+
+.today-card h2 {
+  margin-top: 0;
+  font-size: 1.4rem;
+}
+
+.today-card h2 .sub {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.meal-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+
+.meal-row:first-of-type { border-top: none; }
+
+.meal-tag {
+  min-width: 92px;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: white;
+}
+
+.meal-tag.breakfast { background: var(--breakfast); color: #4a3b09; }
+.meal-tag.lunch { background: var(--lunch); }
+.meal-tag.snack { background: var(--snack); }
+.meal-tag.dinner { background: var(--dinner); }
+
+.meal-body { flex: 1; }
+.meal-body .name { font-weight: 600; font-size: 1.02rem; }
+.meal-body .ingredients { color: var(--muted); font-size: 0.86rem; margin-top: 3px; }
+.meal-body .portion { font-size: 0.8rem; margin-top: 4px; color: var(--accent-dark); }
+
+.meal-actions { display: flex; gap: 6px; }
+
+/* Week grid */
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.day-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.day-card h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+.day-card h3 .sub { color: var(--muted); font-weight: 400; font-size: 0.78rem; }
+
+.day-meal {
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.day-meal:first-of-type { border-top: none; }
+.day-meal .lbl { font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+.day-meal .name { margin-top: 2px; }
+
+/* Recipes view */
+.recipe-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.recipe-col h3 { font-size: 0.95rem; margin-bottom: 8px; }
+
+.recipe-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.recipe-item .name { font-weight: 600; font-size: 0.92rem; }
+.recipe-item .ingredients { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+.recipe-item .portion { font-size: 0.76rem; color: var(--accent-dark); margin-top: 3px; }
+.recipe-item .row-actions { margin-top: 6px; display: flex; gap: 6px; }
+
+.form-grid {
+  display: grid;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 18px;
+}
+
+.form-grid input, .form-grid select, .form-grid textarea {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+
+.form-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.form-row > * { flex: 1; min-width: 140px; }
+
+/* modal */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: none; align-items: center; justify-content: center; z-index: 100;
+  padding: 20px;
+}
+.modal-backdrop.active { display: flex; }
+.modal {
+  background: var(--card); border-radius: var(--radius); padding: 20px;
+  max-width: 420px; width: 100%; max-height: 80vh; overflow-y: auto;
+}
+.modal h3 { margin-top: 0; }
+.modal .recipe-pick {
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px;
+  margin-bottom: 6px; cursor: pointer; font-size: 0.88rem;
+}
+.modal .recipe-pick:hover { border-color: var(--accent); background: #fff7f2; }
+
+.empty {
+  color: var(--muted); font-size: 0.9rem; text-align: center; padding: 30px 0;
+}
+
+@media print {
+  header, nav, .toolbar, .meal-actions, .no-print { display: none !important; }
+  main { max-width: 100%; padding: 0; }
+  .view { display: none !important; }
+  .view.print-target { display: block !important; }
+  .today-card, .day-card { border: none; box-shadow: none; }
+}
