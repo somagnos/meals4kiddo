@@ -63,12 +63,18 @@ function recentlyUsedIds(beforeDate, category, lookbackDays = 4) {
   return used;
 }
 function pickForSlot(date, category) {
-  const pool = recipesByCategory(category);
+  // Disliked recipes are never suggested; liked ones are weighted to appear more often.
+  const pool = recipesByCategory(category).filter(r => r.pref !== "dislike");
   if (pool.length === 0) return null;
   const used = recentlyUsedIds(date, category);
   let candidates = pool.filter(r => !used.has(r.id));
   if (candidates.length === 0) candidates = pool;
-  return candidates[Math.floor(Math.random() * candidates.length)].id;
+  const weighted = [];
+  candidates.forEach(r => {
+    const weight = r.pref === "like" ? 3 : 1;
+    for (let i = 0; i < weight; i++) weighted.push(r.id);
+  });
+  return weighted[Math.floor(Math.random() * weighted.length)];
 }
 function generateDay(date, force = false) {
   const key = toKey(date);
@@ -205,17 +211,37 @@ function renderRecipes() {
     recipesByCategory(slot.key).forEach(r => {
       const item = document.createElement("div");
       item.className = "recipe-item";
+      const likeActive = r.pref === "like" ? "primary" : "";
+      const dislikeActive = r.pref === "dislike" ? "primary" : "";
       item.innerHTML = `
-        <div class="name">${r.name}</div>
+        <div class="name">${r.name} ${r.pref === "like" ? "⭐" : ""}${r.pref === "dislike" ? "🚫" : ""}</div>
         <div class="ingredients">${r.ingredients}</div>
         <div class="portion">Portion: ${r.portion}</div>
         <div class="row-actions no-print">
+          <button class="btn small ${likeActive}" data-like="${r.id}">👍 Likes it</button>
+          <button class="btn small ${dislikeActive}" data-dislike="${r.id}">👎 Avoid</button>
           <button class="btn small" data-del="${r.id}">Delete</button>
         </div>
       `;
       col.appendChild(item);
     });
     container.appendChild(col);
+  });
+  container.querySelectorAll("[data-like]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const r = getRecipe(btn.getAttribute("data-like"));
+      r.pref = r.pref === "like" ? null : "like";
+      saveState();
+      renderRecipes();
+    });
+  });
+  container.querySelectorAll("[data-dislike]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const r = getRecipe(btn.getAttribute("data-dislike"));
+      r.pref = r.pref === "dislike" ? null : "dislike";
+      saveState();
+      renderRecipes();
+    });
   });
   container.querySelectorAll("[data-del]").forEach(btn => {
     btn.addEventListener("click", () => {
