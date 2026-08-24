@@ -207,9 +207,30 @@ function renderWeek() {
 }
 
 // ---------- rendering: Grocery view ----------
+// Prep-state words that describe what you DO with an ingredient at home, not what
+// you ask for at the store (e.g. "shredded chicken" -> "chicken"). Product-form
+// words like "ground"/"minced" are deliberately left alone.
+const PREP_ADJECTIVES = /^(finely\s+)?(steamed|mashed|diced|shredded|grated|sliced|chopped|cooked|scrambled|flaked|slow-cooked|ripe|warm)\s+/i;
+const PREP_PHRASES = /\bcut into[^,]*|\bmixed into[^,]*|\bcut small\b|\bfor pan\b|\bfor dipping\b|\buntil soft\b/gi;
+const TRAILING_NOISE = /\s+(shapes|topping|filling)$/i;
+
+function normalizeIngredient(raw) {
+  let s = raw;
+  s = s.replace(/\([^)]*\)/g, ""); // drop parenthetical notes like (deboned), (soft)
+  s = s.replace(PREP_PHRASES, "");
+  s = s.replace(/^\s*\d+([\/\-]\d+)?\s+/, ""); // drop leading quantity, e.g. "1 egg" -> "egg"
+  let prev;
+  do { prev = s; s = s.replace(PREP_ADJECTIVES, ""); } while (s !== prev);
+  s = s.replace(TRAILING_NOISE, "");
+  s = s.replace(/(\w)\/(\w)/g, "$1 or $2");
+  s = s.replace(/\s+/g, " ").trim();
+  if (s) s = s.charAt(0).toUpperCase() + s.slice(1);
+  return s;
+}
+
 function groceryItemsForWeek(weekStart) {
   ensureWeekGenerated(weekStart);
-  const items = new Map(); // lowercase item -> original-case display text
+  const items = new Map(); // lowercase item -> display text
   for (let i = 0; i < 7; i++) {
     const date = addDays(weekStart, i);
     const plan = state.plans[toKey(date)] || {};
@@ -217,7 +238,7 @@ function groceryItemsForWeek(weekStart) {
       const recipe = getRecipe(plan[slot.key]);
       if (!recipe || !recipe.ingredients) return;
       recipe.ingredients.split(",").forEach(part => {
-        const clean = part.trim().replace(/\.$/, "");
+        const clean = normalizeIngredient(part.trim().replace(/\.$/, ""));
         if (!clean) return;
         const key = clean.toLowerCase();
         if (!items.has(key)) items.set(key, clean);
