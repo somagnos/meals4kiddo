@@ -87,6 +87,15 @@ function ensureWeekGenerated(weekStart) {
   }
 }
 
+// Weekdays show breakfast + dinner only; weekends show all four slots.
+function isWeekend(date) {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+}
+function slotsForDate(date) {
+  return isWeekend(date) ? MEAL_SLOTS : MEAL_SLOTS.filter(s => s.key === "breakfast" || s.key === "dinner");
+}
+
 // ---------- rendering: Today view ----------
 function renderToday() {
   const dateEl = document.getElementById("today-date");
@@ -94,7 +103,7 @@ function renderToday() {
   const plan = generateDay(currentDate, false);
   const container = document.getElementById("today-meals");
   container.innerHTML = "";
-  MEAL_SLOTS.forEach(slot => {
+  slotsForDate(currentDate).forEach(slot => {
     const recipeId = plan[slot.key];
     const recipe = getRecipe(recipeId);
     const row = document.createElement("div");
@@ -159,7 +168,7 @@ function renderWeek() {
     const card = document.createElement("div");
     card.className = "day-card";
     let mealsHtml = "";
-    MEAL_SLOTS.forEach(slot => {
+    slotsForDate(date).forEach(slot => {
       const recipe = getRecipe(plan[slot.key]);
       mealsHtml += `<div class="day-meal"><div class="lbl">${slot.label}</div><div class="name">${recipe ? recipe.name : "-"}</div></div>`;
     });
@@ -243,7 +252,7 @@ function planTextForDate(date) {
   const plan = state.plans[key];
   if (!plan) return "";
   let text = `🍽️ Meal plan for ${fmtLong(date)}\n\n`;
-  MEAL_SLOTS.forEach(slot => {
+  slotsForDate(date).forEach(slot => {
     const r = getRecipe(plan[slot.key]);
     if (!r) return;
     text += `${slot.label}: ${r.name}\n  Ingredients: ${r.ingredients}\n  Portion: ${r.portion}\n\n`;
@@ -258,7 +267,7 @@ function planTextForWeek(weekStart) {
     const key = toKey(date);
     const plan = state.plans[key];
     if (plan) {
-      MEAL_SLOTS.forEach(slot => {
+      slotsForDate(date).forEach(slot => {
         const r = getRecipe(plan[slot.key]);
         if (r) text += `${slot.label}: ${r.name} (${r.portion})\n`;
       });
