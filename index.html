@@ -12,6 +12,7 @@
     <nav>
       <button data-view="today" class="active">Today</button>
       <button data-view="week">Week</button>
+      <button data-view="grocery">Grocery</button>
       <button data-view="recipes">Recipes</button>
     </nav>
   </header>
@@ -50,6 +51,24 @@
       <div class="week-grid" id="week-grid"></div>
     </section>
 
+    <!-- GROCERY VIEW -->
+    <section id="view-grocery" class="view">
+      <div class="toolbar">
+        <button class="btn no-print" id="prev-week-g">← Prev week</button>
+        <button class="btn no-print" id="this-week-g">This week</button>
+        <button class="btn no-print" id="next-week-g">Next week →</button>
+        <div class="spacer"></div>
+        <strong id="grocery-label"></strong>
+        <div class="spacer"></div>
+        <button class="btn no-print" id="copy-grocery">📋 Copy for WhatsApp</button>
+        <button class="btn primary no-print" id="print-grocery">🖨️ Print</button>
+      </div>
+      <div class="today-card">
+        <h2>Shopping list <span class="sub">Ingredients for this week's planned meals</span></h2>
+        <ul class="grocery-list" id="grocery-list"></ul>
+      </div>
+    </section>
+
     <!-- RECIPES VIEW -->
     <section id="view-recipes" class="view">
       <form class="form-grid no-print" id="recipe-form">
@@ -80,7 +99,7 @@
     </div>
   </div>
 
-  <script src="recipes.js?v=4"></script>
-  <script src="app.js?v=4"></script>
+  <script src="recipes.js?v=5"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

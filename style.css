@@ -257,6 +257,32 @@ button.btn.small {
 }
 .modal .recipe-pick:hover { border-color: var(--accent); background: #fff7f2; }
 
+.grocery-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 2;
+  column-gap: 24px;
+}
+.grocery-list li {
+  break-inside: avoid;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.92rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.grocery-list li:first-child { border-top: none; }
+.grocery-list li .box {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1.5px solid var(--muted); flex-shrink: 0;
+}
+.grocery-list li.checked { color: var(--muted); text-decoration: line-through; }
+.grocery-list li.checked .box { background: var(--accent); border-color: var(--accent); }
+@media (max-width: 560px) { .grocery-list { columns: 1; } }
+
 .empty {
   color: var(--muted); font-size: 0.9rem; text-align: center; padding: 30px 0;
 }

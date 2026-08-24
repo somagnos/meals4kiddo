@@ -206,6 +206,51 @@ function renderWeek() {
   });
 }
 
+// ---------- rendering: Grocery view ----------
+function groceryItemsForWeek(weekStart) {
+  ensureWeekGenerated(weekStart);
+  const items = new Map(); // lowercase item -> original-case display text
+  for (let i = 0; i < 7; i++) {
+    const date = addDays(weekStart, i);
+    const plan = state.plans[toKey(date)] || {};
+    slotsForDate(date).forEach(slot => {
+      const recipe = getRecipe(plan[slot.key]);
+      if (!recipe || !recipe.ingredients) return;
+      recipe.ingredients.split(",").forEach(part => {
+        const clean = part.trim().replace(/\.$/, "");
+        if (!clean) return;
+        const key = clean.toLowerCase();
+        if (!items.has(key)) items.set(key, clean);
+      });
+    });
+  }
+  return Array.from(items.values()).sort((a, b) => a.localeCompare(b));
+}
+function renderGrocery() {
+  const label = document.getElementById("grocery-label");
+  const weekEnd = addDays(currentWeekStart, 6);
+  label.textContent = `${fmtShort(currentWeekStart)} – ${fmtShort(weekEnd)}`;
+  const items = groceryItemsForWeek(currentWeekStart);
+  const list = document.getElementById("grocery-list");
+  list.innerHTML = "";
+  if (items.length === 0) {
+    list.innerHTML = `<li class="empty" style="cursor:default">No ingredients yet — plan the week first.</li>`;
+    return;
+  }
+  items.forEach(item => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="box"></span><span>${item}</span>`;
+    li.addEventListener("click", () => li.classList.toggle("checked"));
+    list.appendChild(li);
+  });
+}
+function groceryTextForWeek(weekStart) {
+  const items = groceryItemsForWeek(weekStart);
+  let text = `🛒 Shopping list for the week of ${fmtShort(weekStart)} – ${fmtShort(addDays(weekStart, 6))}\n\n`;
+  items.forEach(item => { text += `- ${item}\n`; });
+  return text.trim();
+}
+
 // ---------- rendering: Recipes view ----------
 function renderRecipes() {
   const container = document.getElementById("recipe-cols");
@@ -318,6 +363,10 @@ async function copyText(text) {
 }
 
 // ---------- nav / view switching ----------
+function setPrintTarget(viewId) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("print-target"));
+  document.getElementById(viewId).classList.add("print-target");
+}
 function switchView(view) {
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
@@ -328,6 +377,7 @@ function switchView(view) {
 function renderAll() {
   renderToday();
   renderWeek();
+  renderGrocery();
   renderRecipes();
 }
 
@@ -356,34 +406,52 @@ document.addEventListener("DOMContentLoaded", () => {
     copyText(planTextForDate(currentDate));
   });
   document.getElementById("print-day").addEventListener("click", () => {
-    document.getElementById("view-today").classList.add("print-target");
-    document.getElementById("view-week").classList.remove("print-target");
+    setPrintTarget("view-today");
     window.print();
   });
 
   document.getElementById("prev-week").addEventListener("click", () => {
     currentWeekStart = addDays(currentWeekStart, -7);
-    renderWeek();
+    renderAll();
   });
   document.getElementById("next-week").addEventListener("click", () => {
     currentWeekStart = addDays(currentWeekStart, 7);
-    renderWeek();
+    renderAll();
   });
   document.getElementById("this-week-btn").addEventListener("click", () => {
     currentWeekStart = startOfWeek(new Date());
-    renderWeek();
+    renderAll();
   });
   document.getElementById("shuffle-week").addEventListener("click", () => {
     for (let i = 0; i < 7; i++) generateDay(addDays(currentWeekStart, i), true);
-    renderWeek();
+    renderAll();
   });
   document.getElementById("copy-week").addEventListener("click", () => {
     ensureWeekGenerated(currentWeekStart);
     copyText(planTextForWeek(currentWeekStart));
   });
   document.getElementById("print-week").addEventListener("click", () => {
-    document.getElementById("view-week").classList.add("print-target");
-    document.getElementById("view-today").classList.remove("print-target");
+    setPrintTarget("view-week");
+    window.print();
+  });
+
+  document.getElementById("prev-week-g").addEventListener("click", () => {
+    currentWeekStart = addDays(currentWeekStart, -7);
+    renderAll();
+  });
+  document.getElementById("next-week-g").addEventListener("click", () => {
+    currentWeekStart = addDays(currentWeekStart, 7);
+    renderAll();
+  });
+  document.getElementById("this-week-g").addEventListener("click", () => {
+    currentWeekStart = startOfWeek(new Date());
+    renderAll();
+  });
+  document.getElementById("copy-grocery").addEventListener("click", () => {
+    copyText(groceryTextForWeek(currentWeekStart));
+  });
+  document.getElementById("print-grocery").addEventListener("click", () => {
+    setPrintTarget("view-grocery");
     window.print();
   });
 
