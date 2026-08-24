@@ -62,9 +62,24 @@ function recentlyUsedIds(beforeDate, category, lookbackDays = 4) {
   }
   return used;
 }
+// Weekdays show breakfast + dinner only; weekends show all four slots.
+function isWeekend(date) {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+}
+function slotsForDate(date) {
+  return isWeekend(date) ? MEAL_SLOTS : MEAL_SLOTS.filter(s => s.key === "breakfast" || s.key === "dinner");
+}
+// On weekdays, lunch recipes double as dinner options too (lunch itself isn't served that day).
+function poolForSlot(date, category) {
+  let pool = recipesByCategory(category);
+  if (category === "dinner" && !isWeekend(date)) {
+    pool = pool.concat(recipesByCategory("lunch"));
+  }
+  return pool.filter(r => r.pref !== "dislike");
+}
 function pickForSlot(date, category) {
-  // Disliked recipes are never suggested; liked ones are weighted to appear more often.
-  const pool = recipesByCategory(category).filter(r => r.pref !== "dislike");
+  const pool = poolForSlot(date, category);
   if (pool.length === 0) return null;
   const used = recentlyUsedIds(date, category);
   let candidates = pool.filter(r => !used.has(r.id));
@@ -80,7 +95,7 @@ function generateDay(date, force = false) {
   const key = toKey(date);
   if (!force && state.plans[key]) return state.plans[key];
   const dayPlan = {};
-  MEAL_SLOTS.forEach(slot => {
+  slotsForDate(date).forEach(slot => {
     dayPlan[slot.key] = pickForSlot(date, slot.key);
   });
   state.plans[key] = dayPlan;
@@ -91,15 +106,6 @@ function ensureWeekGenerated(weekStart) {
   for (let i = 0; i < 7; i++) {
     generateDay(addDays(weekStart, i), false);
   }
-}
-
-// Weekdays show breakfast + dinner only; weekends show all four slots.
-function isWeekend(date) {
-  const day = date.getDay();
-  return day === 0 || day === 6;
-}
-function slotsForDate(date) {
-  return isWeekend(date) ? MEAL_SLOTS : MEAL_SLOTS.filter(s => s.key === "breakfast" || s.key === "dinner");
 }
 
 // ---------- rendering: Today view ----------
@@ -137,7 +143,7 @@ function openSwapModal(date, category) {
   const list = document.getElementById("modal-list");
   document.getElementById("modal-title").textContent = `Choose ${category}`;
   list.innerHTML = "";
-  recipesByCategory(category).forEach(r => {
+  poolForSlot(date, category).forEach(r => {
     const div = document.createElement("div");
     div.className = "recipe-pick";
     div.innerHTML = `<strong>${r.name}</strong><br><span style="color:var(--muted);font-size:0.8rem">${r.ingredients}</span>`;
