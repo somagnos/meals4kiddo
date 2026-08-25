@@ -410,6 +410,23 @@ function planTextForWeek(weekStart) {
   }
   return text.trim();
 }
+function mealTypeTextForWeek(weekStart, slotKey) {
+  ensureWeekGenerated(weekStart);
+  const slot = MEAL_SLOTS.find(s => s.key === slotKey);
+  let text = `🍽️ ${slot.label} plan for the week of ${fmtShort(weekStart)} – ${fmtShort(addDays(weekStart, 6))}\n\n`;
+  let any = false;
+  for (let i = 0; i < 7; i++) {
+    const date = addDays(weekStart, i);
+    if (!slotsForDate(date).some(s => s.key === slotKey)) continue;
+    const plan = state.plans[toKey(date)] || {};
+    const recipe = getRecipe(plan[slotKey]);
+    if (!recipe) continue;
+    any = true;
+    text += `${date.toLocaleDateString(undefined, { weekday: "long" })}: ${recipe.name}\n  Ingredients: ${recipe.ingredients}\n  Portion: ${recipe.portion}\n\n`;
+  }
+  if (!any) text += `(No days this week include ${slot.label.toLowerCase()}.)`;
+  return text.trim();
+}
 async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
@@ -490,6 +507,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("print-week").addEventListener("click", () => {
     setPrintTarget("view-week");
     window.print();
+  });
+  document.querySelectorAll("[data-copy-mealtype]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      copyText(mealTypeTextForWeek(currentWeekStart, btn.getAttribute("data-copy-mealtype")));
+    });
   });
 
   document.getElementById("prev-week-g").addEventListener("click", () => {

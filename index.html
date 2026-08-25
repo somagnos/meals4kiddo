@@ -45,8 +45,15 @@
         <strong id="week-label"></strong>
         <div class="spacer"></div>
         <button class="btn no-print" id="shuffle-week">🔀 Shuffle week</button>
-        <button class="btn no-print" id="copy-week">📋 Copy for WhatsApp</button>
+        <button class="btn no-print" id="copy-week">📋 Copy whole week</button>
         <button class="btn primary no-print" id="print-week">🖨️ Print</button>
+      </div>
+      <div class="toolbar no-print">
+        <span style="color:var(--muted); font-size:0.85rem">Copy just one meal for the whole week:</span>
+        <button class="btn small" data-copy-mealtype="breakfast">📋 Breakfasts</button>
+        <button class="btn small" data-copy-mealtype="lunch">📋 Lunches</button>
+        <button class="btn small" data-copy-mealtype="snack">📋 Snacks</button>
+        <button class="btn small" data-copy-mealtype="dinner">📋 Dinners</button>
       </div>
       <div class="week-grid" id="week-grid"></div>
     </section>
@@ -99,7 +106,7 @@
     </div>
   </div>
 
-  <script src="recipes.js?v=9"></script>
-  <script src="app.js?v=9"></script>
+  <script src="recipes.js?v=10"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
