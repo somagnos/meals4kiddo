@@ -293,4 +293,5 @@ button.btn.small {
   .view { display: none !important; }
   .view.print-target { display: block !important; }
   .today-card, .day-card { border: none; box-shadow: none; }
+  .grocery-list li.checked { display: none; }
 }

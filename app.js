@@ -5,10 +5,13 @@ function loadState() {
   if (raw) {
     try {
       const parsed = JSON.parse(raw);
-      if (parsed.recipes && parsed.plans) return parsed;
+      if (parsed.recipes && parsed.plans) {
+        if (!parsed.groceryChecked) parsed.groceryChecked = {};
+        return parsed;
+      }
     } catch (e) { /* fall through to defaults */ }
   }
-  return { recipes: SEED_RECIPES.slice(), plans: {} };
+  return { recipes: SEED_RECIPES.slice(), plans: {}, groceryChecked: {} };
 }
 
 function saveState() {
@@ -247,11 +250,18 @@ function groceryItemsForWeek(weekStart) {
   }
   return Array.from(items.values()).sort((a, b) => a.localeCompare(b));
 }
+// Checked items are things already bought — persisted per week, and excluded from Copy/Print.
+function groceryCheckedMap(weekStart) {
+  const key = toKey(weekStart);
+  if (!state.groceryChecked[key]) state.groceryChecked[key] = {};
+  return state.groceryChecked[key];
+}
 function renderGrocery() {
   const label = document.getElementById("grocery-label");
   const weekEnd = addDays(currentWeekStart, 6);
   label.textContent = `${fmtShort(currentWeekStart)} – ${fmtShort(weekEnd)}`;
   const items = groceryItemsForWeek(currentWeekStart);
+  const checked = groceryCheckedMap(currentWeekStart);
   const list = document.getElementById("grocery-list");
   list.innerHTML = "";
   if (items.length === 0) {
@@ -259,16 +269,29 @@ function renderGrocery() {
     return;
   }
   items.forEach(item => {
+    const itemKey = item.toLowerCase();
     const li = document.createElement("li");
+    if (checked[itemKey]) li.classList.add("checked");
     li.innerHTML = `<span class="box"></span><span>${item}</span>`;
-    li.addEventListener("click", () => li.classList.toggle("checked"));
+    li.addEventListener("click", () => {
+      if (checked[itemKey]) delete checked[itemKey];
+      else checked[itemKey] = true;
+      saveState();
+      li.classList.toggle("checked");
+    });
     list.appendChild(li);
   });
 }
 function groceryTextForWeek(weekStart) {
   const items = groceryItemsForWeek(weekStart);
+  const checked = groceryCheckedMap(weekStart);
+  const remaining = items.filter(item => !checked[item.toLowerCase()]);
   let text = `🛒 Shopping list for the week of ${fmtShort(weekStart)} – ${fmtShort(addDays(weekStart, 6))}\n\n`;
-  items.forEach(item => { text += `- ${item}\n`; });
+  if (remaining.length === 0) {
+    text += "(Everything checked off — nothing left to buy!)";
+  } else {
+    remaining.forEach(item => { text += `- ${item}\n`; });
+  }
   return text.trim();
 }
 
