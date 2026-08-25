@@ -131,6 +131,7 @@ function renderToday() {
         <div class="portion">${recipe ? "Portion: " + recipe.portion : ""}</div>
       </div>
       <div class="meal-actions no-print">
+        <button class="btn small" data-copy-meal="${slot.key}">📋 Copy</button>
         <button class="btn small" data-swap="${slot.key}">Swap</button>
       </div>
     `;
@@ -139,6 +140,18 @@ function renderToday() {
   container.querySelectorAll("[data-swap]").forEach(btn => {
     btn.addEventListener("click", () => openSwapModal(currentDate, btn.getAttribute("data-swap")));
   });
+  container.querySelectorAll("[data-copy-meal]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const slotKey = btn.getAttribute("data-copy-meal");
+      const slot = MEAL_SLOTS.find(s => s.key === slotKey);
+      const recipe = getRecipe(plan[slotKey]);
+      copyText(singleMealText(currentDate, slot, recipe));
+    });
+  });
+}
+function singleMealText(date, slot, recipe) {
+  if (!recipe) return `${slot.label}: no recipe planned for ${fmtLong(date)}.`;
+  return `🍽️ ${slot.label} — ${fmtLong(date)}\n${recipe.name}\nIngredients: ${recipe.ingredients}\nPortion: ${recipe.portion}`;
 }
 
 function openSwapModal(date, category) {
